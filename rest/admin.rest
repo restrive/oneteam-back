@@ -1,0 +1,281 @@
+@url = http://127.0.0.1:3000/v1
+@devurl = https://podapi.bedev.win/v1
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsImlkIjoxLCJmaXJzdG5hbWUiOiJEYW1pYW4iLCJsYXN0bmFtZSI6IkJlT25lIiwicm9sZV9pZCI6MSwiaWF0IjoxNjQ0ODI0MjAxLCJleHAiOjE3MzEyMjQyMDF9.53IWz22oMDIZym8Hp_NUYhCW1QqTqi7UW9P-7ZQfrVM
+GET {{devurl}}/admin/user/getuser/1
+Authorization: Bearer {{token}}
+
+###
+
+GET {{devurl}}/admin/user/getuserbooks/1
+Authorization: Bearer {{token}}
+###
+
+GET {{devurl}}/admin/user/viewusersbookcontract/1/44
+Authorization: Bearer {{token}}
+
+###
+GET {{devurl}}/admin/user/viewusersbookinfo/1/44
+Authorization: Bearer {{token}}
+
+
+###
+
+GET {{devurl}}/admin/user/getallusers
+Authorization: Bearer {{token}}
+
+###
+GET {{devurl}}/admin/user/getallbooks
+Authorization: Bearer {{token}}
+
+###
+GET {{devurl}}/admin/user/getallcoupons
+Authorization: Bearer {{token}}
+
+###
+DELETE {{url}}/admin/user/deleteuser/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    
+}
+
+###
+DELETE {{url}}/admin/user/deletecoupon/{couponID}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    
+}
+### 
+POST {{url}}/admin/user/adduser
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+   "username":"3!33",
+   "email":"a@a231beone.ai3",
+   "password":"34",
+   "confirm_password":"34",
+   "name_first": "D",
+   "name_last": "D"
+}
+
+
+###
+PUT {{url}}/admin/user/edituser/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+   "name_first":"t",
+   "name_last":"sd",
+   "username":"sd",
+   "email":"a@b.com",
+   "phone_main":""
+}
+
+###
+PUT {{url}}/admin/user/pwd/22
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+   "confirm_pwd":"34",
+   "pwd":"34"
+}
+### A5 NC
+POST {{url}}/admin/user/addpaperresource
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+      "sizes" :["5.500 x 8.500 in (216 x 140 mm) A5", "6.000 x 9.000 in (229 x 152 mm) - NC"],
+    "paperType" : "70lb/104gsm White | SMALL HARDCOVER | Digital Cloth™ cover with Jacket/Jacketed Case Laminate",
+    "paperColor" :"PREMIUM COLOR | Gloss/Matte COLOR COVER",
+    "maxPages" : 840,
+    "perBookCost" : 8.19,
+    "perPageCost" : 0.0716,
+    "isPaperColor" : 1
+}
+###LAARGE A4
+POST {{url}}/admin/user/addpaperresource
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+      "sizes" :["8.250 x 10.750 in (273 x 210 mm) - A4"],
+    "paperType" : "70lb/104gsm White | LARGE HARDCOVER",
+    "paperColor" :"PREMIUM COLOR | Gloss/Matte COLOR COVER",
+    "maxPages" : 840,
+    "perBookCost" : 6.36,
+    "perPageCost" : 0.0954,
+    "isPaperColor" : 1
+}
+
+###
+POST {{devurl}}/admin/user/createcoupon
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+   "coupon_code": "Tester22", // unique code for the coupon
+   "coupon_name": "PRINT OF 1 First", // descripts the coupon
+   "discount_amount": 2, // the amount to be discounted
+   "discount_type": "value", //value or perc : it either takes off a specifc amount or it takes off a percentage
+   "limit_uses":31, //total limit of uses
+   "uses": ["PRINT OF 1"], //is an array of where the coupon will be used
+   "use_type": 0 //0: balance 1: cart 
+}
+###
+
+###
+PUT {{url}}/admin/user/editcoupon/{couponid}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+   "coupon_code":"",
+   "name":"",
+   "discount_amount":0,
+   "discount_type":"",
+   "limit_uses":0,
+   "use_type":0
+}
+### A5
+PUT {{devurl}}/admin/user/approvebook/1/44
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+   "status" :"denied"
+}
+
+###
+PUT {{url}}/admin/user/edituser/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+   "name_first" :"denied",
+   "name_last" :"denied",
+   "email" :"denied@gmail.com",
+   "phone_main" :"denied"
+}
+###
+GET {{devurl}}/admin/user/viewalltransactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+POST  {{url}}/admin/user/addtousercart 
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+        "bookId": 108,
+        "userId": 1,
+        "productId": null,
+        //!for custom cart leave productid null and fill in the bottom part
+        "cost": 200,
+        "name": "100extrapage",
+        "description": "for having more pgaes in your book",
+        "discount":0,
+        "discount_type":1
+
+}
+
+###
+###
+
+PUT {{devurl}}/admin/user/editresource/1
+Authorization: Bearer {{token}}
+Content-type: application/json
+
+{
+        "type":"80gsm A5 Bond B&W",
+        "name":"paper_type", 
+        "international":"0", 
+        "colour":0,
+        "cost":0.2556,
+        "max_pages":900
+}
+###
+
+GET {{url}}/admin/user/viewresources
+Authorization: Bearer {{token}}
+Content-type: application/json
+
+{
+}
+###
+
+PUT {{url}}/admin/user/editsetting/{id}
+Authorization: Bearer {{token}}
+Content-type: application/json
+
+{
+        "name_cost":"cost_incl_vat_percentage",
+        "cost":1.15, 
+        "international":0
+}
+###
+
+GET {{url}}/admin/user/viewsettings
+Authorization: Bearer {{token}}
+Content-type: application/json
+
+{
+}
+###
+GET {{url}}/admin/user/viewproducts
+Authorization: Bearer {{token}}
+Content-type: application/json
+
+{
+}
+###
+
+PUT {{devurl}}/admin/user/editproduct/2
+Authorization: Bearer {{token}}
+Content-type: application/json
+
+{
+        "name":"B1",
+        "cost":1000, 
+        "description":"Book of One",
+        "discount":25,
+        "discount_type":"0"
+}
+###
+
+POST {{url}}/admin/user/refundtransaction
+Authorization: Bearer {{token}}
+Content-type: application/json
+
+{  
+   "transactionId":56
+}
+###
+
+PUT {{url}}/admin/user/approveproofing
+Authorization: Bearer {{token}}
+Content-type: application/json
+
+{  
+   "userId":1,
+   "bookId":148
+}
+
+###
+
+PUT {{url}}/admin/user/autoproofbook
+Authorization: Bearer {{token}}
+Content-type: application/json
+
+{  
+   "userId":1,
+   "bookId":148
+}

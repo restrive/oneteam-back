@@ -1,0 +1,12 @@
+@url = http://localhost:3000/v1
+@token="fdsgdfgdfgfdgdf"
+
+POST {{url}}/frontend/log
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "src":"front",
+    "info":"test",
+    "error_level":"high#sds"
+}

@@ -1,0 +1,68 @@
+
+@url = http://localhost:3000/v1
+@devurl = https://podapi.bedev.win/v1
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsImlkIjoxLCJmaXJzdG5hbWUiOiJEYW1pYW4iLCJsYXN0bmFtZSI6IkJlT25lIiwicm9sZV9pZCI6MSwiaWF0IjoxNjQ0ODI0MjAxLCJleHAiOjE3MzEyMjQyMDF9.53IWz22oMDIZym8Hp_NUYhCW1QqTqi7UW9P-7ZQfrVM
+@refreshToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20iLCJzdGF0ZSI6IjY2ZTc2NzU3NDhkOWI4ZDQwYjllOWFiY2QyNmI3NjdhIiwiaWF0IjoxNjQxODg3OTE0LCJleHAiOjE2NDE5NzQzMTR9.e8ysuj2eEknMc2cA5vJEDWGziXYRSxfoU70Tx7LWPD0"
+//@url = http://localhost:3000/v1
+
+POST {{url}}/authO/login
+Content-Type: application/json
+
+{
+    "email": "admin@admin.com",
+    "password": "j5ruWreBre"
+}
+
+###
+
+POST {{devurl}}/authO/adminlogin
+Content-Type: application/json
+
+{
+    "email": "admin@admin.com",
+    "password": "j5ruWreBre"
+}
+### 
+POST {{url}}/authO/login
+Content-Type: application/json
+
+{
+    "email": "damian@beone.ai",
+    "password": "34"
+}
+
+###
+DELETE {{url}}/authO/logout
+Content-Type: application/json
+
+{
+    "token": 324
+}
+
+###
+
+POST {{url}}/authO/token
+Content-Type: application/json
+
+{
+    "token": {{refreshToken}}
+}
+
+###
+
+POST {{url}}/authO/refresh
+Content-Type: application/json
+
+{
+    "token": {{refreshToken}}
+}
+
+###
+
+GET http://localhost:3000/public/index.html
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsImlkIjoxLCJmaXJzdG5hbWUiOiJEYW1pYW4iLCJsYXN0bmFtZSI6IkJlT25lIiwicm9sZV9pZCI6MSwiaWF0IjoxNjQzODExMjkwLCJleHAiOjE2NDM4MTQ4OTB9.v_H8KWYUDEekBqkkAT0H8j02xj4nSET1aGo-ujCaFF4
+Content-Type: application/json
+
+{
+
+}
