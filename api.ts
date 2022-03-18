@@ -9,10 +9,10 @@ import {updateTasksTimeout,UpdateTasks,insertAsanaTasks,insertAsanaUsers} from "
 import {calculateBaseRating,InsertRating,insertUserCurrentRating,getOldScores,updateScores,calculateScoreAVG,ScoreAvg} from "./utils/asanaRatings";
 // calculateBaseRating(1200136891130799);
 // updateScores();
-getOldScores();
+//getOldScores();
 // const date1 = new Date('2010-01-01');
 // ScoreAvg(1200552057897551,date1);
-// updateTasksTimeout();
+updateTasksTimeout();
 // calculateScoreAVG(1200552057897551);
 // insertAsanaTasks();
 statusCodeSender.start();
