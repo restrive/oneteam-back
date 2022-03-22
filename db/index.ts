@@ -179,7 +179,7 @@ const selectUserOverDueTasks: (userGid: number, endDate: Date) => Promise<any> =
 const selectUserRating: (userGid: number, fromDate: Date, date: Date) => Promise<any> = (userGid, fromDate, date) => {
     return new Promise((resolve, reject) => {
 
-        pool.query(`SELECT * FROM days WHERE days.user_id = ? AND days.day >= ? AND days.day <= ?`, [userGid, fromDate.toISOString().split('T')[0], date], async (err, res) => {
+        pool.query(`SELECT * FROM days WHERE days.user_id = ? AND days.day >= ? AND days.day <= ? ORDER BY completed DESC`, [userGid, fromDate.toISOString().split('T')[0], date], async (err, res) => {
             if (err) {
                 return reject(err);
             }
