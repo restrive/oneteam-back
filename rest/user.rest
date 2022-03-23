@@ -1,6 +1,10 @@
 @url = http://localhost:3000/v1
-@devurl = **
+@devurl = http://api.oneteam.tech/v1
 
+
+###
+
+GET {{devurl}}/user/viewUserRatings
 
 ###
 

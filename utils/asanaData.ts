@@ -195,5 +195,5 @@ export async function updateTasksTimeout() {
     await updateScores();
     setTimeout(() => {
         updateTasksTimeout()
-    }, 300000)
+    }, 1200000)
 }
