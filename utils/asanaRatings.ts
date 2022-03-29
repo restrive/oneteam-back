@@ -130,9 +130,9 @@ export async function InsertRating() {
 
 export async function calculateScoreAVG(userGid: number, toDate: Date = new Date()) {
     const week1 = new Date(toDate);
-    week1.setDate(week1.getDate() - 7);
+    week1.setDate(week1.getDate() - 14);
     const week2 = new Date(toDate);
-    week2.setDate(week2.getDate() - 14);
+    week2.setDate(week2.getDate() - 28);
     const week1Array = await db.selectUserRating(userGid, week1, toDate);
     const scoreWaitedAVG = await ScoreAvg(userGid, week2, toDate);
     if (week1Array.length < 1 || week1Array === false) return 0;
@@ -148,8 +148,8 @@ export async function calculateScoreAVG(userGid: number, toDate: Date = new Date
     }
     week1Sum = week1Sum / week1Divi;
     const date1 = new Date(toDate)
-    date1.setDate(date1.getDate() - 8);
-    const week2Array = await db.selectUserRating(userGid, week2, toDate);
+    date1.setDate(date1.getDate() - 15);
+    const week2Array = await db.selectUserRating(userGid, week2, date1);
 
     if (week2Array.length < 1 || week2Array === false) return 0;
 
@@ -163,11 +163,13 @@ export async function calculateScoreAVG(userGid: number, toDate: Date = new Date
         week2Counter--;
     }
     week2Sum = week2Sum / week2Divi;
-
-    const sum = (week1Sum - week2Sum);
+     if (week2Sum === 0) {
+        week2Sum = 1;
+    }
+    const sum = (week1Sum / week2Sum);
 
     let total = scoreWaitedAVG * sum;
-    console.log(week1Sum , week2Sum,total,scoreWaitedAVG);
+    // console.log("week 1",week1Sum ,"week 2", week2Sum,"total",total,"scoreWaitedAVG",scoreWaitedAVG);
     total = total + scoreWaitedAVG;
     return total;
 }
