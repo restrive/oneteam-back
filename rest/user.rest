@@ -9,3 +9,6 @@ GET {{devurl}}/user/viewUserRatings
 ###
 
 GET {{url}}/user/viewUserRatings
+
+###
+
