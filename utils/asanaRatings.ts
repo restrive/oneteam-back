@@ -29,7 +29,7 @@ export async function calculateBaseRating(userGid: number, date: Date = new Date
     if (userTasks.length < 1) return 1;
     for (let i = 0; i < userTasks.length; i++) {
         if (userTasks[i].completed === "1" && userTasks[i].scored === 0) {
-           
+
             completed = completed + parseInt(completedPenalty, 10);
             // completedTasks.push(userTasks[i]);
             const resp = await db.updateTaskScored(userTasks[i].gid, 1);
@@ -72,7 +72,6 @@ export async function calculateBaseRating(userGid: number, date: Date = new Date
         }
 
     }
-
 
     const rating: any = { "completed": completed, "penalties": negativePoints }
 
@@ -181,6 +180,34 @@ export async function calculateScoreAVG(userGid: number, toDate: Date = new Date
     return total;
 }
 
+export async function calculateGoalDivPen(userGid: number, toDate: Date = new Date()) {
+    const month1 = new Date(toDate);
+    month1.setDate(month1.getMonth() - 1);
+    const week2 = new Date(toDate);
+    week2.setDate(week2.getDate() - 28);
+    const month1Array = await db.selectUserRating(userGid, month1, toDate);
+    console.log(month1, toDate);
+    const scoreWaitedAVG = await ScoreAvg(userGid, week2, toDate);
+    if (month1Array.length < 1 || month1Array === false) return 0;
+
+    let month1Counter = month1Array.length;
+    let penalty = 0;
+    let goalAVG = 0;
+    let month1Divi = 0;
+    for (let i = 0; i < month1Array.length; i++) {
+
+        goalAVG += month1Array[i].goal * month1Counter;
+        penalty += month1Array[i].penalties * -1;
+        month1Divi += month1Counter;
+        month1Counter--;
+    }
+    goalAVG = goalAVG / month1Divi;
+    console.log("value",penalty,goalAVG*30);
+    const sum = goalAVG*30/penalty;
+
+    return sum;
+}
+
 export async function ScoreAvg(userGid: number, fromDate: Date, toDate: Date = new Date()) {
 
     const daysArray = await db.selectUserRating(userGid, fromDate, toDate);
@@ -207,6 +234,7 @@ export async function insertUserCurrentRating(userGid: number, updating: number 
 
     const score = await CalculateScore(userGid, fromDate, date);
     const avgScore = await calculateScoreAVG(userGid, date);
+    // console.log(await calculateGoalDivPen(userGid, date));
     // console.log(score);
     // const date = new Date();
     date.setUTCHours(0, 0, 0, 0);
