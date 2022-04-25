@@ -7,6 +7,8 @@ import { Task } from '../models/TypeTask';
 export async function calculateBaseRating(userGid: number, date: Date = new Date(), endDate: Date = new Date()) {
     if (typeof userGid === undefined) return "userGid === undefined";
     let negativePoints = 0;
+
+
     let completed = 0;
 
     const endDateVar: any = new Date(endDate);
@@ -19,20 +21,24 @@ export async function calculateBaseRating(userGid: number, date: Date = new Date
     dateVar.setHours(0, 0, 0, 0);
 
     const userTasks = await db.selectUserDueTasks(dateVar, userGid, endDateVar);
+    const usercompleted = await db.selectSingleUserRating(userGid,endDate);
+    if (usercompleted.length > 0) {
+        completed = usercompleted[0].completed;
+    }
 
-    const completedTasks = [];
     if (userTasks.length < 1) return 1;
     for (let i = 0; i < userTasks.length; i++) {
         if (userTasks[i].completed === "1" && userTasks[i].scored === 0) {
-            completed = completed + parseInt(completedPenalty,10);
+           
+            completed = completed + parseInt(completedPenalty, 10);
             // completedTasks.push(userTasks[i]);
             const resp = await db.updateTaskScored(userTasks[i].gid, 1);
             if (userTasks[i].misc !== null) {
                 const misc = JSON.parse(userTasks[i].misc)
                 if (misc.tags !== null && typeof misc.tags !== "undefined") {
                     for (let j = 0; j < misc.tags.length; j++) {
-                         if (misc.tags && typeof misc.tags !== undefined && misc.tags[j].gid === "1201982702908529") {
-                            completed = completed + parseInt(reward,10);
+                        if (misc.tags && typeof misc.tags !== undefined && misc.tags[j].gid === "1201982702908529") {// TODO add to env
+                            completed = completed + parseInt(reward, 10);
                         }
                     }
 
@@ -57,7 +63,7 @@ export async function calculateBaseRating(userGid: number, date: Date = new Date
                 for (let j = 0; j < misc.tags.length; j++) {
 
                     if (misc.tags && typeof misc.tags !== undefined && misc.tags[j].gid === "1201976172399152") {
-                        negativePoints = negativePoints - parseInt(tagPenalty,10);
+                        negativePoints = negativePoints - parseInt(tagPenalty, 10);
                         console.log('penalty');
                     }
                 }
@@ -66,6 +72,7 @@ export async function calculateBaseRating(userGid: number, date: Date = new Date
         }
 
     }
+
 
     const rating: any = { "completed": completed, "penalties": negativePoints }
 
@@ -163,7 +170,7 @@ export async function calculateScoreAVG(userGid: number, toDate: Date = new Date
         week2Counter--;
     }
     week2Sum = week2Sum / week2Divi;
-     if (week2Sum === 0) {
+    if (week2Sum === 0) {
         week2Sum = 1;
     }
     const sum = (week1Sum / week2Sum);
@@ -191,28 +198,7 @@ export async function ScoreAvg(userGid: number, fromDate: Date, toDate: Date = n
     return sum * 1000;
 
 }
-/* export async function insertUserCurrentRating(userGid: number, rating: string) {
 
-    const ratingArray: any = []; // TODO make models
-    const cleanRatingArray: any = [];
-    const resp = await db.selectUserRating(userGid);
-    const respArray = JSON.parse(resp[0].rating);
-    // console.log(respArray,1);
-
-    if (respArray.length >= 1) {
-        for (let i = 0; i < respArray.length; i++) {
-
-            if (respArray[i].closed === 1) {
-                ratingArray.push(respArray[i])
-            }
-
-        }
-    }
-
-    ratingArray.push(JSON.parse(rating));
-    const insertResp = await db.insertUserRating(userGid, JSON.stringify(ratingArray));
-    return insertResp;
-} */
 
 export async function insertUserCurrentRating(userGid: number, updating: number = 1, status: number = 0, date: Date, fromDate: Date) {
 
@@ -220,19 +206,19 @@ export async function insertUserCurrentRating(userGid: number, updating: number 
     // const goal = await CalculateGoal(userGid, fromDate, date);
 
     const score = await CalculateScore(userGid, fromDate, date);
-    const avgScore = await calculateScoreAVG(userGid,date);
-
+    const avgScore = await calculateScoreAVG(userGid, date);
+    // console.log(score);
     // const date = new Date();
     date.setUTCHours(0, 0, 0, 0);
 
     if (updating === 0) {// insert
-        const res = await db.insertUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore);// TODO get final score
+        const res = await db.insertUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore);
 
         if (res.affectedRows > 0) {
             return true;
         }
     } else {// update
-        const res = await db.updateUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore);// TODO get final score
+        const res = await db.updateUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore);
 
         if (res.affectedRows > 0) {
             return true;
@@ -273,7 +259,7 @@ export async function getOldScores() {
             const res = await insertUserCurrentRating(users[i].gid, 0, 1, oldDate, fromDate);
         }
     }
-
+    console.log("done");
     // let res = await insertUserCurrentRating(1200552057897551, 1, 1, date, date1);
 }
 
@@ -293,14 +279,17 @@ export async function updateScores() {
             status = 1;
         }
         if (userRating.length < 1 || userRating === false) {
-            const res = await insertUserCurrentRating(users[i].gid, 0, 0, newDate, fromDate);
+
+            await insertUserCurrentRating(users[i].gid, 0, 0, newDate, fromDate);
         } else {
             if (userRating.status !== 1) {
-                const res = await insertUserCurrentRating(users[i].gid, 1, 0, newDate, fromDate);
+
+                await insertUserCurrentRating(users[i].gid, 1, 0, newDate, fromDate);
+            }else{
+                await insertUserCurrentRating(users[i].gid, 1, 1, newDate, fromDate);
             }
+
         }
-
-
 
     }
 
