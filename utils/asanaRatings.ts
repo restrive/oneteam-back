@@ -183,11 +183,10 @@ export async function calculateScoreAVG(userGid: number, toDate: Date = new Date
 export async function calculateGoalDivPen(userGid: number, toDate: Date = new Date()) {
     const month1 = new Date(toDate);
     month1.setDate(month1.getMonth() - 1);
-    const week2 = new Date(toDate);
-    week2.setDate(week2.getDate() - 28);
+
     const month1Array = await db.selectUserRating(userGid, month1, toDate);
     console.log(month1, toDate);
-    const scoreWaitedAVG = await ScoreAvg(userGid, week2, toDate);
+
     if (month1Array.length < 1 || month1Array === false) return 0;
 
     let month1Counter = month1Array.length;
@@ -202,9 +201,27 @@ export async function calculateGoalDivPen(userGid: number, toDate: Date = new Da
         month1Counter--;
     }
     goalAVG = goalAVG / month1Divi;
-    console.log("value",penalty,goalAVG*30);
-    const sum = goalAVG*30/penalty;
 
+    let sum;
+    if (penalty !== 0) {
+        if (goalAVG === 0) {
+            goalAVG = 1;
+        }
+        console.log("value",penalty,goalAVG*30);
+        sum = penalty/(goalAVG*30);
+
+    }else{
+        sum=0;
+    }
+    if (sum > 2) {
+        sum =2;
+    }
+    const waitedScore =await ScoreWaitedAvg(userGid, month1, toDate)
+    sum = waitedScore-sum;
+    if (sum < 0) {
+        sum =0;
+    }
+    sum = sum * 1000;
     return sum;
 }
 
@@ -221,11 +238,30 @@ export async function ScoreAvg(userGid: number, fromDate: Date, toDate: Date = n
         divi += counter;
         counter--;
     }
+
     sum = sum / divi;
     return sum * 1000;
 
 }
 
+export async function ScoreWaitedAvg(userGid: number, fromDate: Date, toDate: Date = new Date()) {
+
+    const daysArray = await db.selectUserRating(userGid, fromDate, toDate);
+    if (daysArray.length < 1 || daysArray === false) return 0;
+
+    let counter = daysArray.length;
+    let sum = 0;
+    let divi = 0;
+    for (let i = 0; i < daysArray.length; i++) {
+        sum += daysArray[i].score * counter;
+        divi += counter;
+        counter--;
+    }
+
+    sum = sum / divi;
+    return sum;
+
+}
 
 export async function insertUserCurrentRating(userGid: number, updating: number = 1, status: number = 0, date: Date, fromDate: Date) {
 
@@ -234,19 +270,20 @@ export async function insertUserCurrentRating(userGid: number, updating: number 
 
     const score = await CalculateScore(userGid, fromDate, date);
     const avgScore = await calculateScoreAVG(userGid, date);
-    // console.log(await calculateGoalDivPen(userGid, date));
-    // console.log(score);
+    const avgScore2 = await calculateGoalDivPen(userGid, date);
+
     // const date = new Date();
     date.setUTCHours(0, 0, 0, 0);
 
     if (updating === 0) {// insert
-        const res = await db.insertUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore);
+        const res = await db.insertUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore,avgScore2);
 
         if (res.affectedRows > 0) {
             return true;
         }
     } else {// update
-        const res = await db.updateUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore);
+
+        const res = await db.updateUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore,avgScore2);
 
         if (res.affectedRows > 0) {
             return true;
@@ -303,6 +340,9 @@ export async function updateScores() {
         const userRating = await db.selectSingleUserRating(users[i].gid, newDate);
 
         let status: number = 0;
+
+
+
         if (newDate.getHours() > 22) {
             status = 1;
         }

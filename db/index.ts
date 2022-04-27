@@ -208,11 +208,11 @@ const selectSingleUserRating: (userGid: number, fromDate: Date) => Promise<any> 
     });
 }
 
-const insertUserRating: (userGid: number, status: number, day: Date, completed: number, penalties: number, goal: number, score: number,scoreAvg: number) => Promise<any> = (userGid, status, day, completed, penalties, goal, score, scoreAvg) => {
+const insertUserRating: (userGid: number, status: number, day: Date, completed: number, penalties: number, goal: number, score: number,scoreAvg: number,avgScore2: number) => Promise<any> = (userGid, status, day, completed, penalties, goal, score, scoreAvg, avgScore2) => {
     return new Promise((resolve, reject) => {
         // console.log(email,password);
-        console.log(userGid, status, day, completed, penalties, goal, score,scoreAvg);
-        pool.query(`INSERT INTO days (days.user_id,days.status,days.day,days.completed,days.penalties,days.goal,days.score,days.score_avg) VALUES (?,?,?,?,?,?,?,?)`, [userGid, status, day.toISOString().split('T')[0], completed, penalties, goal, score,scoreAvg], async (err, res) => {
+        // console.log(userGid, status, day, completed, penalties, goal, score,scoreAvg);
+        pool.query(`INSERT INTO days (days.user_id,days.status,days.day,days.completed,days.penalties,days.goal,days.score,days.score_avg,days.score_avg_2) VALUES (?,?,?,?,?,?,?,?,?)`, [userGid, status, day.toISOString().split('T')[0], completed, penalties, goal, score, scoreAvg, avgScore2], async (err, res) => {
             if (err) {
                 return resolve(err);
             }
@@ -238,10 +238,10 @@ const insertUserRating: (userGid: number, status: number, day: Date, completed: 
     });
 }
 
-const updateUserRating: (userGid: number, status: number, day: Date, completed: number, penalties: number, goal: number, score: number,scoreAvg: number) => Promise<any> = (userGid, status, day, completed, penalties, goal, score, scoreAvg) => {
+const updateUserRating: (userGid: number, status: number, day: Date, completed: number, penalties: number, goal: number, score: number,scoreAvg: number,avgScore2: number) => Promise<any> = (userGid, status, day, completed, penalties, goal, score, scoreAvg,avgScore2) => {
     return new Promise((resolve, reject) => {
-
-        pool.query(`UPDATE days SET days.status = ?,days.completed = ?,days.penalties = ?,days.goal = ?,days.score = ?,days.score_avg=? WHERE user_id = ? AND day = ?`, [status, completed, penalties, goal, score, scoreAvg, userGid, day.toISOString().split('T')[0]], async (err, res) => {
+        console.log(avgScore2);
+        pool.query(`UPDATE days SET days.status = ?,days.completed = ?,days.penalties = ?,days.goal = ?,days.score = ?,days.score_avg=?,days.score_avg_2=? WHERE user_id = ? AND day = ?`, [status, completed, penalties, goal, score, scoreAvg, avgScore2, userGid, day.toISOString().split('T')[0]], async (err, res) => {
             if (err) {
                 return resolve(err);
             }
