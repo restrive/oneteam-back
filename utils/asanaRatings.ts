@@ -185,7 +185,7 @@ export async function calculateGoalDivPen(userGid: number, toDate: Date = new Da
     month1.setDate(month1.getMonth() - 1);
 
     const month1Array = await db.selectUserRating(userGid, month1, toDate);
-    console.log(month1, toDate);
+
 
     if (month1Array.length < 1 || month1Array === false) return 0;
 
