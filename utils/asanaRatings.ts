@@ -217,7 +217,8 @@ export async function calculateGoalDivPen(userGid: number, toDate: Date = new Da
         sum =2;
     }
     const waitedScore =await ScoreWaitedAvg(userGid, month1, toDate)
-    sum = waitedScore-sum;
+    console.log("waitedScoreSum",(waitedScore/goalAVG),waitedScore,sum);
+    sum = (waitedScore/goalAVG)-sum;
     if (sum < 0) {
         sum =0;
     }
@@ -253,7 +254,7 @@ export async function ScoreWaitedAvg(userGid: number, fromDate: Date, toDate: Da
     let sum = 0;
     let divi = 0;
     for (let i = 0; i < daysArray.length; i++) {
-        sum += daysArray[i].score * counter;
+        sum += (daysArray[i].completed + daysArray[i].penalties  ) * counter;
         divi += counter;
         counter--;
     }
