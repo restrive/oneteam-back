@@ -254,7 +254,7 @@ export async function ScoreWaitedAvg(userGid: number, fromDate: Date, toDate: Da
     let sum = 0;
     let divi = 0;
     for (let i = 0; i < daysArray.length; i++) {
-        sum += (daysArray[i].completed + daysArray[i].penalties  ) * counter;
+        sum += (daysArray[i].completed ) * counter;
         divi += counter;
         counter--;
     }
