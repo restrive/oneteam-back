@@ -182,7 +182,7 @@ export async function calculateScoreAVG(userGid: number, toDate: Date = new Date
 
 export async function calculateGoalDivPen(userGid: number, toDate: Date = new Date()) {
     const month1 = new Date(toDate);
-    month1.setDate(month1.getMonth() - 1);
+    month1.setMonth(month1.getMonth() - 1);
 
     const month1Array = await db.selectUserRating(userGid, month1, toDate);
 
