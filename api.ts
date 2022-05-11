@@ -6,15 +6,16 @@ import cors from 'cors';
 import verify from './utils/verify';
 import statusCodeSender from "./utils/statusCodeSender";
 import {updateTasksTimeout,UpdateTasks,insertAsanaTasks,insertAsanaUsers} from "./utils/asanaData";
-import {calculateBaseRating,InsertRating,insertUserCurrentRating,getOldScores,updateScores,calculateScoreAVG,ScoreAvg} from "./utils/asanaRatings";
+import {calculateBaseRating,InsertRating,insertUserCurrentRating,getOldScores,updateScores,calculateScoreAVG,ScoreAvg,getPastPenalties} from "./utils/asanaRatings";
 // calculateBaseRating(1200136891130799);
-// updateScores();
+ // updateScores();
 // getOldScores();
 // const date1 = new Date('2010-01-01');
 // ScoreAvg(1200552057897551,date1);
 updateTasksTimeout();
 // calculateScoreAVG(1200552057897551);
 // insertAsanaTasks();
+// getPastPenalties(1200552057897551);
 statusCodeSender.start();
 
 const app = express();

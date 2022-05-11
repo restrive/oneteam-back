@@ -21,7 +21,7 @@ export async function calculateBaseRating(userGid: number, date: Date = new Date
     dateVar.setHours(0, 0, 0, 0);
 
     const userTasks = await db.selectUserDueTasks(dateVar, userGid, endDateVar);
-    const usercompleted = await db.selectSingleUserRating(userGid,endDate);
+    const usercompleted = await db.selectSingleUserRating(userGid, endDate);
     if (usercompleted.length > 0) {
         completed = usercompleted[0].completed;
     }
@@ -185,7 +185,7 @@ export async function calculateGoalDivPen(userGid: number, toDate: Date = new Da
     month1.setMonth(month1.getMonth() - 1);
 
     const month1Array = await db.selectUserRating(userGid, month1, toDate);
-
+    const penaltiesArray = await getPastPenalties(userGid);
 
     if (month1Array.length < 1 || month1Array === false) return 0;
 
@@ -196,9 +196,13 @@ export async function calculateGoalDivPen(userGid: number, toDate: Date = new Da
     for (let i = 0; i < month1Array.length; i++) {
 
         goalAVG += month1Array[i].goal * month1Counter;
-        penalty += month1Array[i].penalties * -1;
+
         month1Divi += month1Counter;
         month1Counter--;
+    }
+    for (let i = 0; i < penaltiesArray.length; i++) {
+        penalty += penaltiesArray[i];
+
     }
     goalAVG = goalAVG / month1Divi;
 
@@ -207,20 +211,20 @@ export async function calculateGoalDivPen(userGid: number, toDate: Date = new Da
         if (goalAVG === 0) {
             goalAVG = 1;
         }
-        console.log("value",penalty,goalAVG*30);
-        sum = penalty/(goalAVG*30);
+        console.log("value", penalty, goalAVG * 30);
+        sum = penalty / (goalAVG * 30);
 
-    }else{
-        sum=0;
+    } else {
+        sum = 0;
     }
     if (sum > 2) {
-        sum =2;
+        sum = 2;
     }
-    const waitedScore =await ScoreWaitedAvg(userGid, month1, toDate)
-    console.log("waitedScoreSum",(waitedScore/goalAVG),waitedScore,sum);
-    sum = (waitedScore/goalAVG)-sum;
+    const waitedScore = await ScoreWaitedAvg(userGid, month1, toDate)
+    console.log("waitedScoreSum", (waitedScore / goalAVG), waitedScore, sum);
+    sum = (waitedScore / goalAVG) - sum;
     if (sum < 0) {
-        sum =0;
+        sum = 0;
     }
     sum = sum * 1000;
     return sum;
@@ -254,7 +258,7 @@ export async function ScoreWaitedAvg(userGid: number, fromDate: Date, toDate: Da
     let sum = 0;
     let divi = 0;
     for (let i = 0; i < daysArray.length; i++) {
-        sum += (daysArray[i].completed ) * counter;
+        sum += (daysArray[i].completed) * counter;
         divi += counter;
         counter--;
     }
@@ -277,19 +281,83 @@ export async function insertUserCurrentRating(userGid: number, updating: number 
     date.setUTCHours(0, 0, 0, 0);
 
     if (updating === 0) {// insert
-        const res = await db.insertUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore,avgScore2);
+        const res = await db.insertUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore, avgScore2);
 
         if (res.affectedRows > 0) {
             return true;
         }
     } else {// update
 
-        const res = await db.updateUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore,avgScore2);
+        const res = await db.updateUserRating(userGid, status, date, score.completed, score.penalties, score.goal, score.score, avgScore, avgScore2);
 
         if (res.affectedRows > 0) {
             return true;
         }
     }
+}
+
+
+export async function getPastPenalties(userGid: number) {
+    const uncompletedDate = new Date(null);
+    const overduePenalty: any = process.env.Overdue_penalty
+    const tagPenalty: any = process.env.Tag_Pentalty;
+    console.log(uncompletedDate);
+    const completedPenalty: any = process.env.Completed;
+    const reward: any = process.env.Reward;
+
+    const monthDate = new Date();
+    monthDate.setMonth(monthDate.getMonth() - 1);
+
+    const tasks = await db.selectUserPastDueTasks(monthDate, userGid);
+    const valArr = [];
+    for (let j = 0; j < 30; j++) {
+        const day = new Date();
+        day.setDate(day.getDate() - j);
+
+        const dayStart = new Date(day);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(day);
+        dayEnd.setHours(23, 59, 59, 0);
+        let val = 0;
+
+        for (let i = 0; i < tasks.length; i++) {
+            const completedAt = new Date(tasks[i].completed_at);
+            const dueOn = new Date(tasks[i].due_on);
+            dueOn.setDate(dueOn.getDate() + 1);
+           /*  if (tasks[i].name === "Secondary Sitemap for Smart 404 pages") {
+                console.log(completedAt.getTime(),uncompletedDate.getTime());
+                if (completedAt.getTime() === uncompletedDate.getTime()) {
+                    console.log(true);
+                }else{
+                    console.log(false);
+                }
+            } */
+            if (dueOn <= dayStart && (dueOn < completedAt || completedAt.getTime() === uncompletedDate.getTime()) && (completedAt > dayStart || completedAt.getTime() === uncompletedDate.getTime()) && tasks[i].due_on !== null) {
+                val = val + parseFloat(overduePenalty);
+
+                if (tasks[i].misc !== null && tasks[i].misc !== null) {
+
+                    const misc = JSON.parse(tasks[i].misc)
+
+                    if (misc.tags !== null && typeof misc.tags !== "undefined") {
+
+                        for (let x = 0; x < misc.tags.length; x++) {
+
+                            if (misc.tags && typeof misc.tags !== undefined && misc.tags[x].gid === "1201976172399152") {
+                                val = val + parseFloat(tagPenalty);
+
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        valArr.push(val);
+    }
+
+    // console.log(valArr);
+    return valArr;
 }
 
 export async function getOldScores() {
@@ -354,7 +422,7 @@ export async function updateScores() {
             if (userRating.status !== 1) {
 
                 await insertUserCurrentRating(users[i].gid, 1, 0, newDate, fromDate);
-            }else{
+            } else {
                 await insertUserCurrentRating(users[i].gid, 1, 1, newDate, fromDate);
             }
 
