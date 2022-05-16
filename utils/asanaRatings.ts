@@ -299,7 +299,7 @@ export async function insertUserCurrentRating(userGid: number, updating: number 
 
 export async function getPastPenalties(userGid: number) {
     const uncompletedDate = new Date(null);
-    const overduePenalty: any = process.env.Overdue_penalty
+    const overduePenalty: any = process.env.Overdue_penalty;
     const tagPenalty: any = process.env.Tag_Pentalty;
     // console.log(uncompletedDate);
     const completedPenalty: any = process.env.Completed;
@@ -334,7 +334,7 @@ export async function getPastPenalties(userGid: number) {
             } */
             if (dueOn < dayStart && (dueOn < completedAt || completedAt.getTime() === uncompletedDate.getTime()) && (completedAt > dayStart || completedAt.getTime() === uncompletedDate.getTime()) && tasks[i].due_on !== null) {
                 val = val + parseFloat(overduePenalty);
-                /* if (userGid === 1201704391632656) {
+                /* if (userGid === 1200439423072117) {
                     console.log(tasks[i].name,dueOn,completedAt,dayStart);
                 } */
 
