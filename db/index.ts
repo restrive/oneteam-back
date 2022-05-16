@@ -174,11 +174,29 @@ const selectUserDueTasks: (fromDate: Date, userGid: number, endDate: Date) => Pr
         })
     });
 }
+
 const selectUserOverDueTasks: (userGid: number, endDate: Date) => Promise<any> = (userGid, endDate) => {
     return new Promise((resolve, reject) => {
         // console.log(email,password);
 
         pool.query(`SELECT tasks.gid,tasks.name,tasks.created_at,tasks.modified_at,tasks.completed_at,tasks.due_on,tasks.completed,tasks.misc FROM tasks WHERE tasks.due_on < ? AND tasks.Completed = "0" AND tasks.user_gid = ?`, [endDate, userGid], async (err, res) => {
+            if (err) {
+                return reject(err);
+            }
+
+            if (res.length < 1) return resolve(false)
+            else {
+                return resolve(res);
+            }
+        })
+    });
+}
+
+const selectAllOverDueTasks: (endDate: Date) => Promise<any> = (endDate) => {
+    return new Promise((resolve, reject) => {
+        // console.log(email,password);
+
+        pool.query(`SELECT tasks.gid,tasks.user_gid,tasks.name,tasks.created_at,tasks.modified_at,tasks.completed_at,tasks.due_on,tasks.completed,tasks.misc FROM tasks WHERE tasks.due_on < ? AND tasks.Completed = "0"`, [endDate], async (err, res) => {
             if (err) {
                 return reject(err);
             }
@@ -413,5 +431,6 @@ export const db = {
     updateTaskScored,
     UpdateTask,
     selectSingleUserRating,
-    selectUserPastDueTasks
+    selectUserPastDueTasks,
+    selectAllOverDueTasks
 };

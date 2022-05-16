@@ -211,7 +211,7 @@ export async function calculateGoalDivPen(userGid: number, toDate: Date = new Da
         if (goalAVG === 0) {
             goalAVG = 1;
         }
-        console.log("value", penalty, goalAVG * 30);
+        // console.log("value", penalty, goalAVG * 30);
         sum = penalty / (goalAVG * 30);
 
     } else {
@@ -221,7 +221,7 @@ export async function calculateGoalDivPen(userGid: number, toDate: Date = new Da
         sum = 2;
     }
     const waitedScore = await ScoreWaitedAvg(userGid, month1, toDate)
-    console.log("waitedScoreSum", (waitedScore / goalAVG), waitedScore, sum);
+    // console.log("waitedScoreSum", (waitedScore / goalAVG), waitedScore, sum);
     sum = (waitedScore / goalAVG) - sum;
     if (sum < 0) {
         sum = 0;
@@ -301,7 +301,7 @@ export async function getPastPenalties(userGid: number) {
     const uncompletedDate = new Date(null);
     const overduePenalty: any = process.env.Overdue_penalty
     const tagPenalty: any = process.env.Tag_Pentalty;
-    console.log(uncompletedDate);
+    // console.log(uncompletedDate);
     const completedPenalty: any = process.env.Completed;
     const reward: any = process.env.Reward;
 
@@ -332,8 +332,11 @@ export async function getPastPenalties(userGid: number) {
                     console.log(false);
                 }
             } */
-            if (dueOn <= dayStart && (dueOn < completedAt || completedAt.getTime() === uncompletedDate.getTime()) && (completedAt > dayStart || completedAt.getTime() === uncompletedDate.getTime()) && tasks[i].due_on !== null) {
+            if (dueOn < dayStart && (dueOn < completedAt || completedAt.getTime() === uncompletedDate.getTime()) && (completedAt > dayStart || completedAt.getTime() === uncompletedDate.getTime()) && tasks[i].due_on !== null) {
                 val = val + parseFloat(overduePenalty);
+                /* if (userGid === 1201704391632656) {
+                    console.log(tasks[i].name,dueOn,completedAt,dayStart);
+                } */
 
                 if (tasks[i].misc !== null && tasks[i].misc !== null) {
 

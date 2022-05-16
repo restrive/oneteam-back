@@ -3,7 +3,7 @@ import axios from 'axios';
 import { cLog } from './logger';
 import { User } from '../models/TypeUser';
 import { Task } from '../models/TypeTask';
-import {updateScores} from './asanaRatings';
+import { updateScores } from './asanaRatings';
 export async function getAsanaUsers() {
     let val = false;
     let nextpage: any = {};
@@ -181,18 +181,66 @@ export async function UpdateTasks() {
     return true;
 }
 
-export async function UserCompletedTasks(userGid: number) {
-    const date = new Date();
-    date.setMonth(date.getMonth() - 1);
-    const userTasks = await db.selectUserCompletedTasks(date, userGid);
+export async function getTask(taskId: number) {
+    try {
+        const resp = await axios.get(`https://app.asana.com/api/1.0/tasks/${taskId}`, {
+            headers: {
+                Authorization: "Bearer " + process.env.Asana_API_Key
+            }
+        });
+        // console.log(resp.data);
+        if (typeof resp.data.data !== "undefined" && resp.data.data !== null) {
+            return resp.data.data;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        return false;
+    }
 
-    cLog("UserCompletedTasks", JSON.stringify(userTasks));
-    return userTasks;
 }
 
+export async function UpdateOverDueTasks() {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    const overDueTasks = await db.selectAllOverDueTasks(date);
+
+    for (let i = 0; i < overDueTasks.length; i++) {
+        // console.log(overDueTasks[i].user_gid);
+        if (overDueTasks[i].user_gid !== 0) {
+            const task = await getTask(overDueTasks[i].gid);
+
+            const misc = { "tags": task.tags };
+            let assignee = 0;
+            if (task.assignee !== null && typeof task.assignee !== "undefined") {
+                assignee = task.assignee.gid
+                const res = await db.UpdateTask(task, assignee, JSON.stringify(misc));
+                // console.log(task.assignee, res);
+            } else {
+                const res = await db.UpdateTask(overDueTasks[i], assignee, JSON.stringify(misc));
+                // console.log(task.assignee, res);
+            }
+        }
+
+    }
+    return overDueTasks;
+}
+
+export async function getUnassignedTasks() {
+    console.log("UpdateOverDueTasks");
+    await UpdateOverDueTasks();
+    setTimeout(() => {
+        getUnassignedTasks()
+    }, 28800000 )
+}
+let run = false;
 export async function updateTasksTimeout() {
     await UpdateTasks();
     await updateScores();
+    if (run === false) {
+        getUnassignedTasks();
+        run = true;
+    }
     setTimeout(() => {
         updateTasksTimeout()
     }, 1200000)
